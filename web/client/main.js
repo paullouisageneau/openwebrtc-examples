@@ -168,7 +168,7 @@ window.onload = function () {
 function handleMessage(evt) {
     var message = JSON.parse(evt.data);
 
-    if (!pc && (message.sessionDescription || message.sdp || message.candidate))
+    if (!pc && (message.sessionDescription || message.sdp || message.candidateDescription || message.candidate))
         start(false);
 
     if (message.sessionDescription || message.sdp) {
@@ -185,9 +185,9 @@ function handleMessage(evt) {
         var transform = "rotate(" + message.orientation + "deg)";
         remoteView.style.transform = remoteView.style.webkitTransform = transform;
     } else {
-        var d = message.candidate.candidateDescription;
-        if (d && !message.candidate.candidate) {
-            message.candidate.candidate = "candidate:" + [
+        var d = message.candidateDescription;
+        if (d && !message.candidate) {
+            message.candidate = "candidate:" + [
                 d.foundation,
                 d.componentId,
                 d.transport,
@@ -219,11 +219,9 @@ function start(isInitiator) {
             if (!candidateDescription)
                 candidate = evt.candidate.candidate;
             peer.send(JSON.stringify({
-                "candidate": {
                     "candidate": candidate,
                     "candidateDescription": candidateDescription,
                     "sdpMLineIndex": evt.candidate.sdpMLineIndex
-                }
             }));
             console.log("candidate emitted: " + evt.candidate.candidate);
         }
